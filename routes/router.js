@@ -1,82 +1,18 @@
 import { Router } from 'express'
-import { MongoClient, ObjectId } from 'mongodb'
+import { getRoot, getUsers, getUserById, postUser, updateUser, deleteUser } from '../db/db.js'
 
 const router = Router();
 
-const urlMongoDB = 'mongodb://localhost:27017';
-const dbName = 'myExpressApi';
-const collectionName = 'users'
-var collection;
+router.get('/', getRoot);
 
-MongoClient.connect(urlMongoDB, (err, client) => {
-    if (err) {
-        return console.log (err);
-    }
-    var db = client.db(dbName);
-    collection = db.collection(collectionName)
-})
+router.get('/users', getUsers);
 
-router.get('/', (req, res) => {
-    res.send ('root')
-})
+router.get('/users/:id', getUserById);
 
-router.get('/users', (req, res) => {
-    collection.find({}).toArray((err, results) => {
-        if(err)  {
-            console.log(err);
-            return res.sendStatus(500)
-        }
-        res.send (results)
-    })
-})
+router.post('/users', postUser);
 
-router.get('/users/:id', (req, res) => {
-    collection.findOne({ _id: ObjectId(req.params.id)}, (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.sendStatus(500);
-        }
-        res.send(result);
-    })
-})
+router.put('/users/:id', updateUser);
 
-router.post('/users', (req, res) => {
-    var user = {
-        name: req.body.name
-    };
-    collection.insertOne(user, (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.sendStatus(500);
-        }
-        res.send(user);
-    })
-})
-
-router.put('/users/:id', (req,res) => {
-    collection.updateOne(
-        { _id: ObjectId(req.params.id) },
-        {$set: { name: req.body.name }},
-        (err, result) => {
-            if(err) {
-                console.log(err);
-                return res.sendStatus(500);
-            }
-            res.sendStatus(200);
-        }
-    )
-})
-router.delete('/users/:id', (req, res) => {
-    collection.deleteMany(
-        { _id: ObjectId(req.params.id) },
-        (err, result) => {
-            if(err) {
-                console.log(err);
-                return res.sendStatus(500);
-            }
-            res.sendStatus(200);
-        }
-    )
-})
+router.delete('/users/:id', deleteUser);
 
 export default router
