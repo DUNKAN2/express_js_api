@@ -15,3 +15,5 @@ npm run serve
 ```
 npm run start
 ```
+### MongoDB 
+*You need to start and connect MongoDB database to this project*
